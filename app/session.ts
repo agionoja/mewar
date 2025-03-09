@@ -6,14 +6,13 @@ import {
   unstable_createContext,
 } from "react-router";
 import { baseCookiesOptions } from "~/cookies/base-cookie-options";
-import { Role, User, UserModel } from "~/models/user.model";
+import { Role, UserModel } from "~/models/user.model";
 import ms from "ms";
 import { env } from "~/env.config";
 import { redirectWithError, redirectWithSuccess } from "remix-toast";
 import jwt from "~/utils/jwt";
 import { handleError } from "~/utils/error.handler";
 import { isAPIError } from "~/utils/is-api-error";
-import type { DocumentType } from "@typegoose/typegoose";
 
 export const userSession = createCookieSessionStorage<{
   token: string;
