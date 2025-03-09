@@ -1,0 +1,182 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs-eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "routes/index": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/login/route": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/register/route": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/forgot-password/route": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/reset-password/route": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/settings/details/route": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/settings/reset-password/route": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "app/root.tsx",
+        "config": {}
+      },
+      "routes/index": {
+        "id": "routes/index",
+        "parentId": "root",
+        "file": "app/routes/index.ts",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/auth/layout/route": {
+        "id": "routes/auth/layout/route",
+        "parentId": "root",
+        "file": "app/routes/auth/layout/route.tsx",
+        "config": {}
+      },
+      "routes/auth/login/route": {
+        "id": "routes/auth/login/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "app/routes/auth/login/route.tsx",
+        "path": "auth/login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/auth/register/route": {
+        "id": "routes/auth/register/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "app/routes/auth/register/route.tsx",
+        "path": "auth/register",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/auth/forgot-password/route": {
+        "id": "routes/auth/forgot-password/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "app/routes/auth/forgot-password/route.tsx",
+        "path": "auth/forgot-reset-password",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/auth/reset-password/route": {
+        "id": "routes/auth/reset-password/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "app/routes/auth/reset-password/route.tsx",
+        "path": "auth/reset-password/:token",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/settings/layout/route": {
+        "id": "routes/settings/layout/route",
+        "parentId": "root",
+        "file": "app/routes/settings/layout/route.tsx",
+        "config": {}
+      },
+      "routes/settings/details/route": {
+        "id": "routes/settings/details/route",
+        "parentId": "routes/settings/layout/route",
+        "file": "app/routes/settings/details/route.tsx",
+        "path": "settings/details",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/settings/reset-password/route": {
+        "id": "routes/settings/reset-password/route",
+        "parentId": "routes/settings/layout/route",
+        "file": "app/routes/settings/reset-password/route.tsx",
+        "path": "settings/security",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/home/agionoja/code/course-registration/app",
+    "basename": "/",
+    "buildDirectory": "/home/agionoja/code/course-registration/build",
+    "future": {
+      "unstable_optimizeDeps": true,
+      "unstable_splitRouteModules": true,
+      "unstable_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "root.tsx"
+      },
+      "routes/index": {
+        "id": "routes/index",
+        "parentId": "root",
+        "file": "routes/index.ts",
+        "index": true
+      },
+      "routes/auth/layout/route": {
+        "id": "routes/auth/layout/route",
+        "parentId": "root",
+        "file": "routes/auth/layout/route.tsx"
+      },
+      "routes/auth/login/route": {
+        "id": "routes/auth/login/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "routes/auth/login/route.tsx",
+        "path": "auth/login"
+      },
+      "routes/auth/register/route": {
+        "id": "routes/auth/register/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "routes/auth/register/route.tsx",
+        "path": "auth/register"
+      },
+      "routes/auth/forgot-password/route": {
+        "id": "routes/auth/forgot-password/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "routes/auth/forgot-password/route.tsx",
+        "path": "auth/forgot-reset-password"
+      },
+      "routes/auth/reset-password/route": {
+        "id": "routes/auth/reset-password/route",
+        "parentId": "routes/auth/layout/route",
+        "file": "routes/auth/reset-password/route.tsx",
+        "path": "auth/reset-password/:token"
+      },
+      "routes/settings/layout/route": {
+        "id": "routes/settings/layout/route",
+        "parentId": "root",
+        "file": "routes/settings/layout/route.tsx"
+      },
+      "routes/settings/details/route": {
+        "id": "routes/settings/details/route",
+        "parentId": "routes/settings/layout/route",
+        "file": "routes/settings/details/route.tsx",
+        "path": "settings/details"
+      },
+      "routes/settings/reset-password/route": {
+        "id": "routes/settings/reset-password/route",
+        "parentId": "routes/settings/layout/route",
+        "file": "routes/settings/reset-password/route.tsx",
+        "path": "settings/security"
+      }
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
