@@ -1,6 +1,8 @@
-import { Types } from "mongoose";
-import { getModelForClass } from "@typegoose/typegoose";
-import { Expose, Transform } from "class-transformer";
+import {
+  getDiscriminatorModelForClass,
+  getModelForClass,
+  type ReturnModelType,
+} from "@typegoose/typegoose";
 import type {
   AnyParamConstructor,
   IModelOptions,
@@ -8,13 +10,29 @@ import type {
 
 type Discriminator<T> = T extends string ? T : string;
 
+const defaultSchemaOptions: IModelOptions["schemaOptions"] = {
+  timestamps: true,
+  toJSON: {
+    virtuals: true,
+    getters: true,
+    transform: (_, ret) => {
+      ret._id = ret._id.toString();
+      return ret;
+    },
+  },
+  toObject: {
+    virtuals: true,
+    getters: true,
+    transform: (_, ret) => {
+      ret._id = ret._id.toString();
+      return ret;
+    },
+  },
+};
+
 export abstract class BaseModel<
   TDiscriminator extends string | undefined = undefined,
 > {
-  @Expose()
-  @Transform(({ obj, key }) =>
-    obj[key] instanceof Types.ObjectId ? obj[key].toString() : obj[key],
-  )
   public _id!: string;
 
   public id?: string;
@@ -32,19 +50,26 @@ export function createModelFromClass<TClass extends BaseModel>(
 ) {
   return getModelForClass(cl, {
     schemaOptions: {
-      timestamps: true,
-      toJSON: {
-        virtuals: true,
-        getters: true,
-      },
-      toObject: {
-        virtuals: true,
-        getters: true,
-      },
+      ...defaultSchemaOptions,
+      ...schemaOptions, // Allow custom overrides
+    },
+    ...props,
+  });
+}
 
+export function createDiscriminatorModelFromClass<
+  TBase extends BaseModel,
+  TClass extends TBase,
+>(
+  baseModel: ReturnModelType<AnyParamConstructor<TBase>>,
+  cl: AnyParamConstructor<TClass>,
+  { schemaOptions, ...props }: IModelOptions = {},
+) {
+  return getDiscriminatorModelForClass(baseModel, cl, {
+    schemaOptions: {
+      ...defaultSchemaOptions,
       ...schemaOptions,
     },
-
     ...props,
   });
 }
