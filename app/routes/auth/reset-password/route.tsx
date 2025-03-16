@@ -6,7 +6,8 @@ import { useApiErrorToast } from "~/hooks/use-api-error-toast";
 import { redirectWithSuccess } from "remix-toast";
 import { isAPIError } from "~/utils/is-api-error";
 import { apiErrorResponse } from "~/utils/api-error-response";
-import { useFocusErrorField } from "~/hooks/use-focus-error-field";
+import { useFocusError } from "~/hooks/use-focus-error-field";
+import { useRef } from "react";
 import {
   AuthForm,
   FormInput,
@@ -24,11 +25,15 @@ export async function action({ params, request }: Route.ActionArgs) {
 }
 
 export default function RouteComponent({ actionData }: Route.ComponentProps) {
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+  const passwordConfirmRef = useRef<HTMLInputElement | null>(null);
   const error = useApiErrorToast(actionData);
-  const createRefHandler = useFocusErrorField<User>(error);
+
+  useFocusError<User>(error, passwordRef, "password");
+  useFocusError<User>(error, passwordConfirmRef, "passwordConfirm");
 
   return (
-    <AuthForm submitText={"Reset"} method={"PATCH"}>
+    <AuthForm method={"PATCH"}>
       <FormLabel>
         <div className="flex w-full justify-between">
           <FormSpan>Password</FormSpan>
@@ -38,11 +43,11 @@ export default function RouteComponent({ actionData }: Route.ComponentProps) {
           >
             Get new Reset Link?
           </Link>
-        </div>{" "}
+        </div>
         <FormInput
           type={"password"}
           name={"password"}
-          ref={createRefHandler("password")}
+          ref={passwordRef}
           required
           maxLength={53}
           minLength={8}
@@ -53,7 +58,7 @@ export default function RouteComponent({ actionData }: Route.ComponentProps) {
         <FormInput
           type={"password"}
           name={"passwordConfirm"}
-          ref={createRefHandler("passwordConfirm")}
+          ref={passwordConfirmRef}
           required
           maxLength={53}
           minLength={8}

@@ -9,9 +9,10 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 import "./app.css";
+import "react-international-phone/style.css";
 import { toast, Toaster } from "sonner";
 import { getToast } from "remix-toast";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -59,7 +60,8 @@ export default function App({ loaderData }: Route.ComponentProps) {
         duration: loaderData.toast.duration,
       });
     }
-  }, [loaderData.toast]);
+  }, [loaderData]);
+
   return <Outlet />;
 }
 

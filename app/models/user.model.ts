@@ -1,16 +1,26 @@
 import {
   type DocumentType,
-  getDiscriminatorModelForClass,
   Pre,
   prop,
   type Ref,
   type ReturnModelType,
 } from "@typegoose/typegoose";
-import { BaseModel, createModelFromClass } from "~/models/base.model";
+import {
+  BaseModel,
+  createDiscriminatorModelFromClass,
+  createModelFromClass,
+} from "~/models/base.model";
 import { Course } from "~/models/course.model";
 import scrypt from "~/utils/scrypt";
 import type { ValidatorProps } from "mongoose";
 import { NotFoundException } from "~/utils/exception";
+import validator from "validator";
+import {
+  CourseOptions,
+  Department,
+  FACULTIES,
+  Faculty,
+} from "~/configs/faculty.config";
 
 // Password Validation Utilities
 const SPECIAL_CHARS = "!@#$%^&*()_+-=[]{}|;:'\",.<>/?`~";
@@ -34,14 +44,19 @@ const PASSWORD_REGEX = new RegExp(
 
 // Enums
 export enum Role {
-  STUDENT = "Student",
-  ADMIN = "Admin",
+  STUDENT = "student",
+  ADMIN = "admin",
+}
+
+export enum Gender {
+  MALE = "male",
+  FEMALE = "female",
 }
 
 export enum EnrollmentStatus {
-  ENROLLED = "ENROLLED",
-  COMPLETED = "COMPLETED",
-  DROPPED = "DROPPED",
+  ENROLLED = "enrolled",
+  COMPLETED = "completed",
+  DROPPED = "dropped",
 }
 
 // Base User Class
@@ -55,23 +70,54 @@ export enum EnrollmentStatus {
 export class User<
   TDiscriminator extends string | undefined = undefined,
 > extends BaseModel<TDiscriminator> {
-  @prop({ required: true, type: String, index: true })
+  @prop({
+    required: true,
+    type: String,
+    index: true,
+    minlength: 2,
+    maxlength: 53,
+    lowercase: true,
+  })
   public firstname!: string;
 
-  @prop({ required: true, type: String, index: true })
+  @prop({
+    required: true,
+    type: String,
+    index: true,
+    minlength: 2,
+    maxlength: 53,
+    lowercase: true,
+  })
   public lastname!: string;
 
-  @prop({ required: true, type: String, index: true, unique: true })
+  @prop({
+    required: true,
+    type: String,
+    index: true,
+    unique: true,
+    lowercase: true,
+    validate: [validator.isEmail, "Enter a valid email address."],
+  })
   public email!: string;
+
+  @prop({
+    required: true,
+    type: String,
+    index: true,
+    unique: true,
+    validate: [
+      (mobilePhone: string) =>
+        validator.isMobilePhone(mobilePhone, "en-NG", { strictMode: true }),
+      "Invalid Phone number",
+    ],
+  })
+  public phone!: string;
 
   @prop({ type: String })
   public previousEmail?: string;
 
   @prop({ type: Date })
   public emailChangedAt?: Date;
-
-  @prop({ required: true, type: String, index: true, unique: true })
-  public phone!: string;
 
   @prop({ enum: Role, type: String, default: Role.STUDENT })
   public role: Role = Role.STUDENT;
@@ -181,7 +227,8 @@ export class User<
   }
 }
 
-// Student Subclass
+function Department() {}
+
 export class Student extends User<Role.STUDENT> {
   @prop({ required: true, type: () => [Course], ref: () => Course })
   public courses!: Ref<Course>[];
@@ -194,20 +241,42 @@ export class Student extends User<Role.STUDENT> {
 
   @prop({ type: String, enum: Role, default: Role.STUDENT })
   declare role: Role.STUDENT;
+
+  @prop({ type: String, required: true, unique: true })
+  public registrationNumber!: string;
+
+  @prop({ type: String, enum: FACULTIES.map((f) => f.name), required: true })
+  public faculty!: Faculty;
+
+  @prop({
+    type: String,
+    enum: FACULTIES.flatMap((f) => f.departments.map((d) => d.name)),
+    required: true,
+  })
+  public department!: Department;
+
+  @prop({
+    type: String,
+    enum: FACULTIES.flatMap((f) =>
+      f.departments.flatMap((d) => d.courseOptions),
+    ),
+    required: true,
+  })
+  public courseOption!: CourseOptions;
 }
 
-// Admin Subclass
 export class Admin extends User<Role.ADMIN> {
   @prop({ type: String, enum: Role, default: Role.ADMIN })
   declare role: Role.ADMIN;
 }
 
-// Model Exports
 export const UserModel = createModelFromClass(User);
-export const StudentModel = getDiscriminatorModelForClass(UserModel, Student);
-export const AdminModel = getDiscriminatorModelForClass(UserModel, Admin);
+export const StudentModel = createDiscriminatorModelFromClass(
+  UserModel,
+  Student,
+);
+export const AdminModel = createDiscriminatorModelFromClass(UserModel, Admin);
 
-// Validation Helpers
 function getPasswordValidationMessage({ value }: ValidatorProps): string {
   if (!value || typeof value !== "string") return "Password is required";
   if (value.length < 8) return "Password must be at least 8 characters long";

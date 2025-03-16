@@ -35,7 +35,7 @@ export async function handleError<
   TData,
   TMessage extends string | undefined = undefined,
 >(
-  request: Request,
+  request: Pick<Request, "url">,
   callback: () => Promise<APISuccess<TData, TMessage>>,
 ): Promise<APIResponse<TData, TMessage>> {
   const path = request.url || "";
@@ -44,6 +44,15 @@ export async function handleError<
   try {
     return await callback();
   } catch (error: unknown) {
+    // Check if the error is a redirect Response
+    if (
+      error instanceof Response &&
+      error.status >= 300 &&
+      error.status < 400
+    ) {
+      throw error; // Rethrow redirects to let Remix handle them
+    }
+
     let apiError: APIError;
 
     if (error instanceof Exception) {
@@ -63,7 +72,7 @@ export async function handleError<
         statusCode: HttpStatus.BAD_REQUEST,
         message: "Validation failed",
         error: "ValidationError",
-        field: firstIssue?.path[0]?.toString(), // First field from Zod path
+        field: firstIssue?.path[0]?.toString(),
         errors: error.issues.map((issue) => issue.message),
         path,
         timestamp,
@@ -118,7 +127,7 @@ export async function handleError<
         statusCode: HttpStatus.BAD_REQUEST,
         message: firstError?.message || "Validation failed",
         error: "ValidationError",
-        field: firstError?.path, // Field causing the validation error
+        field: firstError?.path,
         errors: errors.map((e) => e.message),
         path,
         timestamp,
@@ -173,6 +182,10 @@ export async function handleError<
 
     if (env.NODE_ENV === "production") {
       delete apiError.stack;
+    }
+
+    if (env.NODE_ENV === "development") {
+      console.dir(apiError, { depth: null });
     }
 
     return apiError;

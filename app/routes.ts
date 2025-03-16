@@ -9,6 +9,7 @@ import {
 export default [
   index("routes/index.ts"),
 
+  // Auth Routes
   layout(
     "routes/auth/layout/route.tsx",
     prefix("auth", [
@@ -19,14 +20,22 @@ export default [
     ]),
   ),
 
+  //Logout Route
+  route("logout", "routes/auth/logout.ts"),
+
   layout("routes/account/layout/route.tsx", [
     // User Routes
-    route("dashboard", "routes/account/user/dashboard/route.tsx"),
+    layout("routes/account/user/layout/route.tsx", [
+      route("dashboard", "routes/account/user/dashboard/route.tsx"),
+    ]),
 
     //Admin Routes
-    ...prefix("admin", [
-      route("dashboard", "routes/account/admin/dashboard/route.tsx"),
-    ]),
+    layout(
+      "routes/account/admin/layout/route.tsx",
+      prefix("admin", [
+        route("dashboard", "routes/account/admin/dashboard/route.tsx"),
+      ]),
+    ),
 
     //Settings Routes
     layout(

@@ -1,18 +1,7 @@
 import { Outlet } from "react-router";
-import type { Route } from "./+types/route";
-import { requireUser, userContext } from "~/session";
+import { authMiddleware } from "~/session/auth.session";
 
-const sessionMiddleware: Route.unstable_MiddlewareFunction = async (
-  { context, request },
-  next,
-) => {
-  const user = await requireUser(request);
-  context.set(userContext, user);
-
-  return next();
-};
-
-export const unstable_middleware = [sessionMiddleware];
+export const unstable_middleware = [authMiddleware];
 
 export default function RouteComponent() {
   return (

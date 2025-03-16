@@ -53,7 +53,7 @@ export async function connectToDatabase({
         cached.conn = await cached.promise;
 
         // Enable debug mode in development
-        if (process.env.NODE_ENV === "development") {
+        if (env.NODE_ENV === "development") {
           mongoose.set("debug", true);
         }
 

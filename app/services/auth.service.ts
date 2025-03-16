@@ -1,4 +1,9 @@
-import { StudentModel, type User, UserModel } from "~/models/user.model";
+import {
+  Student,
+  StudentModel,
+  type User,
+  UserModel,
+} from "~/models/user.model";
 import scrypt from "~/utils/scrypt";
 import { sha256 } from "~/utils/hash";
 import {
@@ -11,13 +16,16 @@ import { randomBytes } from "node:crypto";
 
 export async function register(
   user: Pick<
-    User,
+    Student,
     | "firstname"
     | "lastname"
     | "email"
     | "password"
     | "passwordConfirm"
     | "phone"
+    | "faculty"
+    | "department"
+    | "courseOption"
   >,
 ) {
   return (await StudentModel.create(user)).toObject();
@@ -32,7 +40,8 @@ export async function login({
     .lean()
     .exec();
 
-  if (!user || !(await scrypt.compare(password, user.password))) {
+  const isPasswordMatch = await scrypt.compare(password, user?.password);
+  if (!user || !isPasswordMatch) {
     throw new UnauthorizedException<User>(
       "Email or password is incorrect.",
       "email",

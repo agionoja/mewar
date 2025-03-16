@@ -3,7 +3,7 @@ import { env } from "~/env.config";
 import ms from "ms";
 
 interface Decoded extends jsonwebtoken.JwtPayload {
-  _id: string;
+  sub: string;
 }
 
 function isJwtPayload(decoded: any): decoded is jsonwebtoken.JwtPayload {
@@ -16,10 +16,10 @@ function isJwtPayload(decoded: any): decoded is jsonwebtoken.JwtPayload {
   );
 }
 
-export function sign({ _id }: Pick<Decoded, "_id">): Promise<string> {
+export function sign({ sub }: Pick<Decoded, "sub">): Promise<string> {
   return new Promise((resolve, reject) => {
     jsonwebtoken.sign(
-      { _id },
+      { sub },
       env.SESSION_SECRET,
       { expiresIn: env.SESSION_EXPIRES as ms.StringValue },
       (err, token) => {

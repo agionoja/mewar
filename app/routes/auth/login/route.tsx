@@ -7,12 +7,13 @@ import {
 } from "~/routes/auth/components/auth-form";
 import { login } from "~/controllers/auth.controller";
 import { isAPIError } from "~/utils/is-api-error";
-import { createSession, redirectIfHasSession } from "~/session";
+import { createSession, redirectIfHasSession } from "~/session/auth.session";
 import { apiErrorResponse } from "~/utils/api-error-response";
 import { useApiErrorToast } from "~/hooks/use-api-error-toast";
-import { useFocusErrorField } from "~/hooks/use-focus-error-field";
+import { useFocusError } from "~/hooks/use-focus-error-field";
 import type { User } from "~/models/user.model";
-import { href, Link } from "react-router";
+import { href, Link, useSearchParams } from "react-router";
+import { useRef } from "react";
 
 export async function action({ request }: Route.ActionArgs) {
   const response = await login(request);
@@ -24,9 +25,10 @@ export async function action({ request }: Route.ActionArgs) {
   await createSession({
     remember: response.data.remember,
     request,
-    role: response.data.role,
-    token: response.data._id,
+    role: response.data.user.role,
+    token: response.data.user._id,
     message: response.message,
+    redirectTo: response.data.redirect,
   });
 }
 
@@ -35,17 +37,27 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function RouteComponent({ actionData }: Route.ComponentProps) {
+  const [searchParams] = useSearchParams();
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
   const error = useApiErrorToast(actionData);
-  const createRefHandler = useFocusErrorField<User>(error);
+  const redirect = searchParams.get("redirect") ?? href("/auth/login");
+
+  useFocusError<User>(error, emailRef, "email");
+  useFocusError<User>(error, passwordRef, "password");
 
   return (
-    <AuthForm submitText={"Login"}>
+    <AuthForm>
+      <input type="text" hidden defaultValue={redirect} name={"redirect"} />
       <FormLabel>
         <FormSpan>Email</FormSpan>
         <FormInput
+          autoCapitalize={"email"}
+          aria-invalid={error?.field === "email"}
+          aria-errormessage={error?.message}
           type={"email"}
           name={"email"}
-          ref={createRefHandler("email")}
+          ref={emailRef}
           required
           maxLength={53}
           minLength={8}
@@ -62,9 +74,12 @@ export default function RouteComponent({ actionData }: Route.ComponentProps) {
           </Link>
         </div>
         <FormInput
+          autoComplete={"current-password"}
+          aria-invalid={error?.field === "password"}
+          aria-errormessage={error?.message}
           type={"password"}
           name={"password"}
-          ref={createRefHandler("password")}
+          ref={passwordRef}
           required
           maxLength={53}
           minLength={8}
@@ -78,7 +93,7 @@ export default function RouteComponent({ actionData }: Route.ComponentProps) {
           </span>
         </label>
         <Link to={href("/auth/register")} className={"text-xs text-yellow-500"}>
-          Don't have an account?
+          You don't have an account?
         </Link>
       </div>
     </AuthForm>
